@@ -1,0 +1,34 @@
+arm_64bit=1
+start_file=start4.elf
+fixup_file=fixup4.dat
+
+#gpu_mem=512
+
+over_voltage=6
+arm_freq=2147
+gpu_freq=750
+arm_boost=1
+
+# Optional HDMI:
+# If your device does not use external HDMI, skip over
+# the search for a display to speed up boot time.
+# disable_fw_kms_setup=1
+# disable_overscan=1
+# hdmi_enable_4kp60=1
+
+
+### reComputer r100x ############################
+
+dtparam=i2c_arm=on
+dtparam=spi=on
+enable_uart=1
+
+dtoverlay=dwc2,dr_mode=host
+dtoverlay=vc4-kms-v3d
+dtoverlay=audremap,pins_18_19
+dtoverlay=i2c1,pins_44_45
+dtoverlay=i2c3,pins_2_3
+dtoverlay=i2c6,pins_22_23
+
+dtoverlay=reComputer-R100x,uart2
+dtoverlay=tpm-spi-slx9670
