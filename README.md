@@ -1,8 +1,8 @@
 # Chromasurf — reComputer R100x CM4
 
-Custom [Nerves](https://nerves-project.org) system for the [Seeed Studio reComputer R1000](https://wiki.seeedstudio.com/recomputer_r/) (CM4, aarch64).
+**Chromasurf** is an industrial IoT platform built on [Elixir](https://elixir-lang.org) and [Nerves](https://nerves-project.org), developed by [Formrausch](https://formrausch.com). It provides the firmware foundation for connected HMI terminals, gateways, and sensor nodes — with automatic network clustering, over-the-air updates, real-time messaging, and full hardware abstraction built in. Designed for production use in manufacturing, process control, and industrial automation.
 
-Built on `nerves_system_br` (Buildroot). Headless industrial gateway with RS485, LoRa, and LTE support.
+This repository contains the Nerves base system image for the [Seeed Studio reComputer R1000](https://wiki.seeedstudio.com/recomputer_r/) (CM4, aarch64). It includes the Linux kernel, bootloader, RS485/UART drivers, GPIO expander, and all hardware support needed to run Chromasurf applications on this headless industrial gateway. Built on `nerves_system_br` (Buildroot).
 
 ## Using
 
