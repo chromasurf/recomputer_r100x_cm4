@@ -30,5 +30,5 @@ dtoverlay=i2c1,pins_44_45
 dtoverlay=i2c3,pins_2_3
 dtoverlay=i2c6,pins_22_23
 
-dtoverlay=reComputer-R100x,uart2
+dtoverlay=reComputer-R100x
 dtoverlay=tpm-spi-slx9670

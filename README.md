@@ -20,6 +20,26 @@ mix firmware
 mix burn
 ```
 
+## Hardware Revisions
+
+This system defaults to **V1.1** hardware. If you have a V1.0 board, override `config.txt` in your app:
+
+```
+# config/nerves/config.txt (V1.0 only)
+dtoverlay=reComputer-R100x,uart2
+```
+
+Key differences:
+
+| | V1.0 (`uart2`) | V1.1 (default) |
+|---|---|---|
+| PCA9535 I2C | I2C3 | I2C5 |
+| LoRa SPI | `/dev/spidev0.0` | `/dev/spidev1.1` |
+| LoRa I2C | `/dev/i2c-1` | `/dev/i2c-6` |
+| Buzzer | GPIO21 (direct) | PCA9535 P15 (sysfs) |
+
+See [Seeed V1.1 change details](https://wiki.seeedstudio.com/recomputer_r1000_v1_1_description/) for full list.
+
 ## Hardware Overview
 
 | Peripheral | Chip | Bus | Address | sysfs / Device |
