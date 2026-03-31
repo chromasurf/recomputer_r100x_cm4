@@ -10,25 +10,42 @@ gpu_freq=750
 arm_boost=1
 
 # Optional HDMI:
-# If your device does not use external HDMI, skip over
-# the search for a display to speed up boot time.
 # disable_fw_kms_setup=1
 # disable_overscan=1
 # hdmi_enable_4kp60=1
 
 
-### reComputer r100x ############################
+### reComputer R100x V1.1 (default) ##############
+# V1.1: PCA9535 on I2C5, SPI1, no uart2 parameter
+# Pin config is handled by the DT overlay automatically.
 
 dtparam=i2c_arm=on
-dtparam=spi=on
 enable_uart=1
 
 dtoverlay=dwc2,dr_mode=host
 dtoverlay=vc4-kms-v3d
-dtoverlay=audremap,pins_18_19
 dtoverlay=i2c1,pins_44_45
-dtoverlay=i2c3,pins_2_3
 dtoverlay=i2c6,pins_22_23
 
 dtoverlay=reComputer-R100x
 dtoverlay=tpm-spi-slx9670
+
+
+### reComputer R100x V1.0 ########################
+# Uncomment and replace the V1.1 section above if you have V1.0 hardware.
+# V1.0: PCA9535 on I2C3, SPI0, needs uart2 parameter.
+# See: https://wiki.seeedstudio.com/recomputer_r1000_v1_1_description/
+#
+# dtparam=i2c_arm=on
+# dtparam=spi=on
+# enable_uart=1
+#
+# dtoverlay=dwc2,dr_mode=host
+# dtoverlay=vc4-kms-v3d
+# dtoverlay=audremap,pins_18_19
+# dtoverlay=i2c1,pins_44_45
+# dtoverlay=i2c3,pins_2_3
+# dtoverlay=i2c6,pins_22_23
+#
+# dtoverlay=reComputer-R100x,uart2
+# dtoverlay=tpm-spi-slx9670
