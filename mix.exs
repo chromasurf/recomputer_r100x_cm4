@@ -1,8 +1,8 @@
-defmodule ChromasurfRecomputerR100xCm4.MixProject do
+defmodule RecomputerR100xCm4.MixProject do
   use Mix.Project
 
   @github_organization "chromasurf"
-  @app :chromasurf_recomputer_r100x_cm4
+  @app :recomputer_r100x_cm4
   @source_url "https://github.com/#{@github_organization}/#{@app}"
   @version Path.join(__DIR__, "VERSION")
            |> File.read!()
