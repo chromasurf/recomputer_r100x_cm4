@@ -10,7 +10,7 @@ Add the system as a dependency in your Nerves app and set `MIX_TARGET=recomputer
 
 ```elixir
 # mix.exs
-{:chromasurf_recomputer_r100x_cm4, github: "chromasurf/recomputer-r100x-cm4", runtime: false, targets: :recomputer_r100x_cm4}
+{:recomputer_r100x_cm4, github: "chromasurf/recomputer_r100x_cm4", runtime: false, targets: :recomputer_r100x_cm4}
 ```
 
 ```bash
