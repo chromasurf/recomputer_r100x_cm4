@@ -1,1 +1,1 @@
-dwc_otg.lpm_enable=0 console=serial0,115200 root=/dev/mmcblk0p5 rootfstype=squashfs rootwait consoleblank=0 quiet
+dwc_otg.lpm_enable=0 console=serial0,115200 root=/dev/mmcblk0p5 rootfstype=squashfs rootwait consoleblank=0 quiet cgroup_enable=memory cgroup_memory=1
