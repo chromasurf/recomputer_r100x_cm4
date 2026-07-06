@@ -12,6 +12,25 @@ follows:
    releases, and Linux kernel updates. They're also made to fix bugs and add
    features to the build infrastructure.
 
+## v1.3.0
+
+Minor update for a major Buildroot release: tracks `nerves_system_br` v1.34.0,
+bringing a new Erlang/OTP, Linux kernel, and toolchain. Headless gateway system,
+so display/browser refinements don't apply.
+
+**Breaking for downstream:** the image now ships Erlang/OTP 29, so consuming
+projects must build with OTP 29 (Elixir 1.20+). This board uses an ATECC608A —
+`nerves_key_pkcs11` must be `~> 1.3` to avoid a TLS segfault.
+
+* Changes
+  * Remove the `pigpio` package — dropped upstream in Buildroot 2026.05 (no
+    longer maintained). Use `libgpiod` / `circuits_gpio` for GPIO.
+
+* Updated dependencies
+  * [nerves_system_br v1.34.0](https://github.com/nerves-project/nerves_system_br/releases/tag/v1.34.0)
+    (Erlang/OTP 29.0.2, Buildroot 2026.05, GCC 15.3.0)
+  * Linux kernel 6.18 (Raspberry Pi `stable_20260527` tag), RPi firmware 1.20260521
+
 ## v1.2.1
 
 Security/bug fix update that tracks `nerves_system_br` v1.33.9 (up from
