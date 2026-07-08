@@ -1,5 +1,9 @@
 # Chromasurf — reComputer R100x CM4
 
+<img src="assets/images/recomputer-r100x.jpg" alt="Seeed Studio reComputer R1000" width="480">
+
+<sub>Image: © [Seeed Studio](https://wiki.seeedstudio.com/recomputer_r1000_intro/)</sub>
+
 **Chromasurf** is an industrial IoT platform built on [Elixir](https://elixir-lang.org) and [Nerves](https://nerves-project.org), developed by [Formrausch](https://formrausch.com). It provides the firmware foundation for connected HMI terminals, gateways, and sensor nodes — with automatic network clustering, over-the-air updates, real-time messaging, and full hardware abstraction built in. Designed for production use in manufacturing, process control, and industrial automation.
 
 This repository contains the Nerves base system image for the [Seeed Studio reComputer R1000](https://wiki.seeedstudio.com/recomputer_r/) (CM4, aarch64). It includes the Linux kernel, bootloader, RS485/UART drivers, GPIO expander, and all hardware support needed to run Chromasurf applications on this headless industrial gateway. Built on `nerves_system_br` (Buildroot).
@@ -19,6 +23,8 @@ mix deps.get
 mix firmware
 mix burn
 ```
+
+The system ships Erlang/OTP 29 — your application needs Elixir ≥ 1.20. When using NervesKey/ATECC608A, depend on `nerves_key_pkcs11 ~> 1.3`.
 
 ## Hardware Revisions
 
@@ -204,12 +210,12 @@ mix nerves.artifact
 
 ## Linux Kernel
 
-Kernel: Linux 6.12 (Raspberry Pi fork)
-Config: `linux-6.12.defconfig` (stripped-down for Nerves)
+Kernel: Linux 6.18 (Raspberry Pi fork, tag `stable_20260527`)
+Config: `linux-6.18.defconfig` (stripped-down for Nerves)
 
 ---
 
-[formrausch](https://formrausch.com) /ˈfɔʁmˌʁaʊ̯ʃ/ is a creative studio uniting designers and developers to build beautiful, functional digital products.
+<img src="assets/images/fr_io_logo_signet_red.svg" alt="formrausch logo" height="24" align="top"> [formrausch](https://formrausch.com) /ˈfɔʁmˌʁaʊ̯ʃ/ is a creative studio uniting designers and developers to build beautiful, functional digital products.
 
 ## License
 
