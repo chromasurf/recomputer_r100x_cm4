@@ -12,6 +12,19 @@ follows:
    releases, and Linux kernel updates. They're also made to fix bugs and add
    features to the build infrastructure.
 
+## v1.3.3
+
+Build tooling — no functional changes to the image.
+
+* Changes
+  * `mix.exs`: require `{:nerves, "~> 1.15"}` and drop both the
+    `nerves_container` dependency and the explicit `build_runner:` selection
+    added in v1.3.2. Nerves 1.15.0 ships the Apple `container` build runner
+    upstream (the same code) and selects it on Apple Silicon by itself, falling
+    back to Docker elsewhere. Build volumes carry over unchanged — same names,
+    same `.container_id`, same `/home/nerves/project` working directory — so
+    this costs no rebuild.
+
 ## v1.3.2
 
 Build tooling — no functional changes to the image.
