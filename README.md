@@ -28,10 +28,10 @@ The system ships Erlang/OTP 29 — your application needs Elixir ≥ 1.20. When 
 
 ## Hardware Revisions
 
-This system defaults to **V1.1** hardware. If you have a V1.0 board, override `config.txt` in your app:
+This system defaults to **V1.1** hardware. For a V1.0 board, copy the system's `config.txt` into your app, change
+the overlay line and point `CHROMASURF_CONFIG_TXT` at the copy (see [Boot Files](#boot-files)):
 
 ```
-# config/nerves/config.txt (V1.0 only)
 dtoverlay=reComputer-R100x,uart2
 ```
 
@@ -45,6 +45,27 @@ Key differences:
 | Buzzer | GPIO21 (direct) | PCA9535 P15 (sysfs) |
 
 See [Seeed V1.1 change details](https://wiki.seeedstudio.com/recomputer_r1000_v1_1_description/) for full list.
+
+## Boot Files
+
+The system's `fwup.conf` writes `config.txt` and the two kernel command lines from the system image. An app
+replaces any of them by setting an environment variable before `mix firmware`, for example in
+`config/target.exs`:
+
+```elixir
+System.put_env("CHROMASURF_CONFIG_TXT", Path.expand("config.txt", __DIR__))
+System.put_env("CHROMASURF_CMDLINE_A", Path.expand("cmdline-a.txt", __DIR__))
+System.put_env("CHROMASURF_CMDLINE_B", Path.expand("cmdline-b.txt", __DIR__))
+```
+
+| Variable | Replaces | Written to |
+|---|---|---|
+| `CHROMASURF_CONFIG_TXT` | `config.txt` | both boot partitions |
+| `CHROMASURF_CMDLINE_A` | `cmdline-a.txt` | `cmdline.txt` of slot A |
+| `CHROMASURF_CMDLINE_B` | `cmdline-b.txt` | `cmdline.txt` of slot B |
+
+Start from the system's files in `~/.nerves/artifacts/recomputer_r100x_cm4-portable-<version>/images/` and keep their `root=` partitions. Building the
+firmware needs fwup 1.12 or later.
 
 ## Hardware Overview
 
@@ -210,8 +231,11 @@ mix nerves.artifact
 
 ## Linux Kernel
 
-Kernel: Linux 6.18 (Raspberry Pi fork, tag `stable_20260527`)
+Kernel: Linux 6.18.50 (Raspberry Pi fork, tag `stable_20260911`), booted as gzip-compressed `kernel8.img`
 Config: `linux-6.18.defconfig` (stripped-down for Nerves)
+
+The CM4 runs at stock clocks. Overclocked, a board in continuous operation froze with watchdog resets; see the
+v1.4.0 entry in the [CHANGELOG](CHANGELOG.md).
 
 ---
 

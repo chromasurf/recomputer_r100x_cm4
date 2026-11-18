@@ -12,6 +12,57 @@ follows:
    releases, and Linux kernel updates. They're also made to fix bugs and add
    features to the build infrastructure.
 
+## v1.4.0
+
+Moves to Buildroot 2026.08.1, Erlang/OTP 29.1.2 and Linux 6.18.50, takes over
+the boot-time changes from the reTerminal systems, and runs under Nerves 1 and
+Nerves 2.
+
+* Package updates
+  * [nerves_system_br 1.35.3](https://github.com/nerves-project/nerves_system_br/releases/tag/v1.35.3):
+    Buildroot 2026.08.1, Erlang/OTP 29.1.2, fwup 1.17.0. Fixes the missing
+    available-memory patch on OTP 29 (`system_memory_high_watermark`).
+  * Linux 6.18.50 (`raspberrypi/linux` `stable_20260911`), rpi-firmware 1.20260915
+    `linux/ili9881c_fix.patch` follows the new `rzw,t101p136cq` entry in the
+    panel match table.
+  * Target toolchain: the Nerves toolchain 15.3.0 (GCC 15.3, glibc 2.43)
+    instead of the Arm GNU Toolchain 15.2 (glibc 2.42). Apps compile their NIFs
+    with the same toolchain the system is built with.
+
+* Changes
+  * `cmdline-a.txt` / `cmdline-b.txt`: no `rootfstype=squashfs`, so the same
+    system boots SquashFS and EROFS root filesystems.
+  * `kernel8.img` is the gzip-compressed kernel; `post-createfs.sh` writes
+    `images/kernel8.img.gz`, `images/Image` stays in the artifact.
+  * `config.txt`: `kernel=` and `device_tree=` named explicitly,
+    `initial_turbo=60`, `boot_delay=0`, `boot_delay_ms=0`.
+  * `config.txt`: stock clocks. `over_voltage=6`, `arm_freq=2147`,
+    `gpu_freq=750` and `arm_boost=1` are gone: overclocked, a board in continuous
+    operation froze with a watchdog reset (`rsts=0x20`) 5 times in 45 h; at stock
+    clocks none in 47 h.
+  * Kernel: `CONFIG_DRM_VC4=m` (with `SND` / `SND_SOC`, which vc4 depends on).
+    `config.txt` already loaded `vc4-kms-v3d`, but the kernel had no vc4 driver,
+    so HDMI had no Linux output.
+  * Only `bcm2711-rpi-cm4.dtb` is built and written; the Pi 4B and Pi 400
+    device trees are gone.
+  * fwup: boot partition files are written as deltas against the other slot on
+    upgrade (`require-fwup-version` 1.12.0).
+  * fwup: an app replaces `config.txt`, `cmdline-a.txt` or `cmdline-b.txt` by
+    setting `CHROMASURF_CONFIG_TXT`, `CHROMASURF_CMDLINE_A` or
+    `CHROMASURF_CMDLINE_B` to a file path in the environment of `mix firmware`;
+    it no longer needs its own copy of `fwup.conf`.
+  * `fwup.conf` is rendered from `fwup.conf.eex` before every `mix compile`;
+    the checksum covers only the template and now also the `linux/` patches.
+  * Kernel: `CONFIG_SQUASHFS_ZSTD=y` and `CONFIG_EROFS_FS=y`. Apps can switch to
+    `-comp zstd` (Nerves 1, `mksquashfs_flags`) or `rootfs_type: :erofs`
+    (Nerves 2).
+  * `config/config.exs` starts `nerves_bootstrap` and `cli/0` sets
+    `default_target: :target`, replacing the `loadconfig` alias (as in
+    `nerves_system_rpi4`). `mix docs` works with parallel dependency
+    compilation (`MIX_OS_DEPS_COMPILE_PARTITION_COUNT`).
+  * Nerves 2: `rootfs.tar` is built again (Nerves 2 assembles the root
+    filesystem from it), `nerves` allows `~> 2.0`, toolchain package 15.3.1.
+
 ## v1.3.3
 
 Build tooling — no functional changes to the image.
