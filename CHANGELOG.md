@@ -12,6 +12,17 @@ follows:
    releases, and Linux kernel updates. They're also made to fix bugs and add
    features to the build infrastructure.
 
+## v1.4.1
+
+* Changes
+  * TPM: `reComputer-R100x` declared `TPM_RST` (PCA9535 pin 4) without
+    `gpio-hog`, so the line stayed an input at 0, the SLB9670 sat in reset and
+    `tpm_tis_spi spi1.0` failed with -110. `TPM_RST` is now hogged high.
+  * `config.txt`: drop `tpm-spi-slx9670`. `reComputer-R100x` already defines
+    the TPM (spi1.0, spi0.0 with `uart2`); the second node on spi0 never
+    probed, because gpio9 belongs to the UART. The overlay is no longer built
+    or written. An app with its own `config.txt` drops the line too.
+
 ## v1.4.0
 
 Moves to Buildroot 2026.08.1, Erlang/OTP 29.1.2 and Linux 6.18.50, takes over

@@ -47,8 +47,6 @@ boot_resources = [
   %{name: "overlays/vc4-kms-v3d.dtbo", path: "${NERVES_SYSTEM}/images/rpi-firmware/overlays/vc4-kms-v3d.dtbo"},
   %{name: "overlays/vc4-kms-v3d-pi4.dtbo", path: "${NERVES_SYSTEM}/images/rpi-firmware/overlays/vc4-kms-v3d-pi4.dtbo"},
   %{name: "overlays/w1-gpio-pullup.dtbo", path: "${NERVES_SYSTEM}/images/rpi-firmware/overlays/w1-gpio-pullup.dtbo"},
-  # TPM
-  %{name: "overlays/tpm-spi-slx9670.dtbo", path: "${NERVES_SYSTEM}/images/rpi-firmware/overlays/tpm-spi-slx9670.dtbo"},
   # Rethings resources
   %{name: "overlays/reComputer-R100x.dtbo", path: "${NERVES_SYSTEM}/images/rpi-firmware/overlays/reComputer-R100x.dtbo"},
 ]

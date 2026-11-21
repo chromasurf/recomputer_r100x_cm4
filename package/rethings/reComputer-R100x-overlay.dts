@@ -84,8 +84,10 @@
 					line-name = "LTE_RESET";
 				};
 
+				/* Hog: without it the line stays an input at 0 and holds the SLB9670 on spi1.0 in reset. */
 				TPM_RST {
-					gpios = <&pcf857x 4 GPIO_ACTIVE_HIGH>;
+					gpio-hog;
+					gpios = <4 GPIO_ACTIVE_HIGH>;
 					output-high;
 					line-name = "TPM_RST";
 				};

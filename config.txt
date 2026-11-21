@@ -33,7 +33,7 @@ dtoverlay=i2c1,pins_44_45
 dtoverlay=i2c6,pins_22_23
 
 dtoverlay=reComputer-R100x
-dtoverlay=tpm-spi-slx9670
+# No tpm-spi-slx9670: reComputer-R100x defines the SLB9670 itself (spi1.0, spi0.0 with uart2).
 
 
 ### reComputer R100x V1.0 ########################
@@ -53,4 +53,3 @@ dtoverlay=tpm-spi-slx9670
 # dtoverlay=i2c6,pins_22_23
 #
 # dtoverlay=reComputer-R100x,uart2
-# dtoverlay=tpm-spi-slx9670
