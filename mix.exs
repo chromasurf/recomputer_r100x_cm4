@@ -12,7 +12,6 @@ defmodule RecomputerR100xCm4.MixProject do
     [
       app: @app,
       version: @version,
-      # Because we're using OTP 28, we need to enforce Elixir 1.17 or later.
       elixir: "~> 1.17",
       compilers: Mix.compilers() ++ [:nerves_package],
       nerves_package: nerves_package(),
@@ -104,8 +103,10 @@ defmodule RecomputerR100xCm4.MixProject do
   # fwup.conf is rendered from fwup.conf.eex, so the checksum covers only the template.
   defp source_finger_print_files do
     [
+      "app.txt",
       "config/config.exs",
       "fwup_include",
+      "package",
       "rootfs_overlay",
       "CHANGELOG.md",
       "cmdline-a.txt",

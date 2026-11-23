@@ -48,11 +48,29 @@ See [Seeed V1.1 change details](https://wiki.seeedstudio.com/recomputer_r1000_v1
 
 ## Boot Files
 
-The system's `fwup.conf` writes `config.txt` and the two kernel command lines from the system image. An app
-replaces any of them by setting an environment variable before `mix firmware`, for example in
-`config/target.exs`:
+The system's `fwup.conf` writes `config.txt`, `app.txt` and the two kernel command lines. `config.txt` ends
+with `include app.txt`, and the system's `app.txt` holds only a comment. To add or override
+`config.txt` lines, set `CHROMASURF_CONFIG_APP` to your own `app.txt`, as in the example below.
+
+In the Nerves systems (`nerves_system_rpi4` and others) you copy the system's `fwup.conf` and point
+`config :nerves, :firmware, fwup_conf:` at the copy. Here the system's `fwup.conf` stays in use and you set
+the variables below; `app.txt` exists only in these systems.
 
 ```elixir
+# config/target.exs of the app; __DIR__ is the app's config/ directory
+System.put_env("CHROMASURF_CONFIG_APP", Path.expand("app.txt", __DIR__))
+```
+
+```
+# config/app.txt
+dtparam=ant1=on
+```
+
+The firmware reads `gpu_mem` before it follows `include`; for another `gpu_mem`, replace the
+whole `config.txt`. The other variables replace a file:
+
+```elixir
+# config/target.exs of the app: config/config.txt, config/cmdline-a.txt, config/cmdline-b.txt
 System.put_env("CHROMASURF_CONFIG_TXT", Path.expand("config.txt", __DIR__))
 System.put_env("CHROMASURF_CMDLINE_A", Path.expand("cmdline-a.txt", __DIR__))
 System.put_env("CHROMASURF_CMDLINE_B", Path.expand("cmdline-b.txt", __DIR__))
@@ -60,12 +78,65 @@ System.put_env("CHROMASURF_CMDLINE_B", Path.expand("cmdline-b.txt", __DIR__))
 
 | Variable | Replaces | Written to |
 |---|---|---|
+| `CHROMASURF_CONFIG_APP` | `app.txt` | both boot partitions |
 | `CHROMASURF_CONFIG_TXT` | `config.txt` | both boot partitions |
 | `CHROMASURF_CMDLINE_A` | `cmdline-a.txt` | `cmdline.txt` of slot A |
 | `CHROMASURF_CMDLINE_B` | `cmdline-b.txt` | `cmdline.txt` of slot B |
 
-Start from the system's files in `~/.nerves/artifacts/recomputer_r100x_cm4-portable-<version>/images/` and keep their `root=` partitions. Building the
-firmware needs fwup 1.12 or later.
+Start from the system's files in `~/.nerves/artifacts/recomputer_r100x_cm4-portable-<version>/images/` and keep their
+`root=` partitions. Building the firmware needs fwup 1.12 or later.
+
+## Reboot on Kernel Errors
+
+The command line carries `oops=panic` and `sysctl.kernel.panic_on_rcu_stall=1`: an oops or an RCU stall
+panics the kernel, and the watchdog restarts the board (about 30 s). `loglevel=5` passes KERN_NOTICE
+messages to the consoles, the pstore console included. To switch the reboot off at runtime:
+
+```elixir
+File.write!("/proc/sys/kernel/panic_on_oops", "0")
+File.write!("/proc/sys/kernel/panic_on_rcu_stall", "0")
+```
+
+or at build time with `CHROMASURF_CMDLINE_A` / `CHROMASURF_CMDLINE_B` pointing at command lines without
+both parameters.
+
+## Nerves 2 and EROFS
+
+The system builds under Nerves 1.15 and Nerves 2. It ships `images/rootfs.tar`, the kernel has
+`CONFIG_EROFS_FS` and `CONFIG_SQUASHFS_ZSTD`, and the command line names no root filesystem type.
+
+To move an app to Nerves 2:
+
+```elixir
+# mix.exs: {:nerves, "~> 2.0.0-pre.10", runtime: false}, no {:shoehorn, ...}
+steps: [&Nerves.init_release/1, :assemble]
+
+# config/target.exs, instead of `config :shoehorn, init: ..., last: ...`
+config :nerves, application_sort: [init: [:nerves_runtime], last: [:nerves_pack]]
+
+# config/config.exs: EROFS root filesystem (needs mkfs.erofs, `brew install erofs-utils`)
+config :nerves, :firmware, rootfs_type: :erofs
+```
+
+On a reTerminal DM the radio app drew its first frame 3.3 s after kernel start with EROFS (lz4hc),
+4.2 s with SquashFS zstd and 4.7 s with SquashFS gzip. For SquashFS zstd under Nerves 1, set
+`config :nerves, :firmware, mksquashfs_flags: ["-no-xattrs", "-quiet", "-comp", "zstd", "-b", "16K"]`.
+
+Nerves 2 expects the system archive in `~/.nerves/dl/<app>-<version>/`; a local system build puts it
+in `~/.nerves/dl/`. Until a system version is released, build the app with
+`NERVES_SYSTEM=~/.nerves/artifacts/recomputer_r100x_cm4-portable-<version>`.
+
+## Crash Logging (pstore)
+
+`config.txt` loads `ramoops-pi4` with 128 KiB: the kernel console (32 KiB), panic dumps (16 KiB records)
+and pmsg (32 KiB) survive a watchdog reset or a warm reboot in `/sys/fs/pstore`.
+
+## GPU Memory
+
+`config.txt` sets `gpu_mem=16`. With less than 32 MB the firmware loads the cut-down `start4cd.elf`
+without codecs and camera ISP; vc4 (HDMI) allocates from CMA and is not affected. For video decoding or a camera,
+set `gpu_mem=76` in your own `config.txt` (`CHROMASURF_CONFIG_TXT`). The firmware reads `gpu_mem`
+before it follows `include app.txt`.
 
 ## Hardware Overview
 
@@ -178,7 +249,7 @@ serial = info.manufacturer_sn
 
 ### TPM 2.0
 
-Infineon SLB9670 on SPI1. Available at `/dev/tpm0`. The system includes `tpm2-pkcs11` for PKCS#11 integration.
+Infineon SLB9670 on SPI1 (SPI0 with `uart2`), declared by the `reComputer-R100x` overlay; `TPM_RST` (PCA9535 P04) is hogged high so the TPM leaves reset. Available at `/dev/tpm0`. The system includes `tpm2-pkcs11` for PKCS#11 integration.
 
 ## RTC
 
