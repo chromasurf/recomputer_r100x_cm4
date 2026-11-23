@@ -12,6 +12,29 @@ follows:
    releases, and Linux kernel updates. They're also made to fix bugs and add
    features to the build infrastructure.
 
+## v1.4.1
+
+* Changes
+  * TPM: `reComputer-R100x` declared `TPM_RST` (PCA9535 pin 4) without
+    `gpio-hog`, so the line stayed an input at 0, the SLB9670 stayed in reset and
+    `tpm_tis_spi spi1.0` failed with -110. `TPM_RST` is now hogged high.
+  * `config.txt`: drop `tpm-spi-slx9670`. `reComputer-R100x` already defines
+    the TPM (spi1.0, spi0.0 with `uart2`); the second node on spi0 never
+    probed, because gpio9 is assigned to the UART. The overlay is no longer built
+    or written. Remove the line from an own `config.txt` too.
+  * `config.txt`: pstore with `ramoops-pi4`, 128 KiB (kernel console, panic
+    dumps, pmsg); before, only with the overlay in an own `config.txt`.
+  * Kernel command line: `oops=panic`, `sysctl.kernel.panic_on_rcu_stall=1` and
+    `loglevel=5`. An oops or an RCU stall reboots the gateway through the
+    watchdog; KERN_NOTICE messages reach the pstore console. README,
+    "Reboot on Kernel Errors", shows how to switch it off.
+  * fwup: `config.txt` ends with `include app.txt`. `CHROMASURF_CONFIG_APP`
+    points at an own `app.txt` that adds or overrides lines, without a copy
+    of the whole `config.txt`; the system's `app.txt` holds only a
+    comment. The firmware reads `gpu_mem` before it follows `include`.
+  * The artifact checksum covers `package/` (kernel modules, overlays) and
+    `app.txt`; before, a change there produced no new artifact.
+
 ## v1.4.0
 
 Moves to Buildroot 2026.08.1, Erlang/OTP 29.1.2 and Linux 6.18.50, takes over
@@ -47,14 +70,14 @@ Nerves 2.
     device trees are gone.
   * fwup: boot partition files are written as deltas against the other slot on
     upgrade (`require-fwup-version` 1.12.0).
-  * fwup: an app replaces `config.txt`, `cmdline-a.txt` or `cmdline-b.txt` by
-    setting `CHROMASURF_CONFIG_TXT`, `CHROMASURF_CMDLINE_A` or
-    `CHROMASURF_CMDLINE_B` to a file path in the environment of `mix firmware`;
-    it no longer needs its own copy of `fwup.conf`.
+  * fwup: `CHROMASURF_CONFIG_TXT`, `CHROMASURF_CMDLINE_A` and
+    `CHROMASURF_CMDLINE_B` in the environment of `mix firmware` replace
+    `config.txt`, `cmdline-a.txt` and `cmdline-b.txt`; a copy of `fwup.conf`
+    is no longer needed.
   * `fwup.conf` is rendered from `fwup.conf.eex` before every `mix compile`;
     the checksum covers only the template and now also the `linux/` patches.
-  * Kernel: `CONFIG_SQUASHFS_ZSTD=y` and `CONFIG_EROFS_FS=y`. Apps can switch to
-    `-comp zstd` (Nerves 1, `mksquashfs_flags`) or `rootfs_type: :erofs`
+  * Kernel: `CONFIG_SQUASHFS_ZSTD=y` and `CONFIG_EROFS_FS=y`. Selected in the app's config
+    with `-comp zstd` (Nerves 1, `mksquashfs_flags`) or `rootfs_type: :erofs`
     (Nerves 2).
   * `config/config.exs` starts `nerves_bootstrap` and `cli/0` sets
     `default_target: :target`, replacing the `loadconfig` alias (as in

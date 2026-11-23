@@ -2,14 +2,14 @@ arm_64bit=1
 start_file=start4.elf
 fixup_file=fixup4.dat
 
-# No file search: the firmware loads exactly these two.
+# The firmware loads these two files without searching for them.
 kernel=kernel8.img
 device_tree=bcm2711-rpi-cm4.dtb
 
 gpu_mem=16
 
-# Stock clocks: overclocked (over_voltage=6, arm_freq=2147, gpu_freq=750, arm_boost=1) a board in continuous
-# operation froze with a watchdog reset (rsts=0x20), 5 times in 45 h; at stock clocks none in 47 h.
+# Stock clocks. Overclocked (over_voltage=6, arm_freq=2147, gpu_freq=750, arm_boost=1), a board had 5 watchdog
+# resets (rsts=0x20) in 45 h, at stock clocks 0 in 47 h.
 initial_turbo=60
 boot_delay=0
 boot_delay_ms=0
@@ -22,7 +22,7 @@ boot_delay_ms=0
 
 ### reComputer R100x V1.1 (default) ##############
 # V1.1: PCA9535 on I2C5, SPI1, no uart2 parameter
-# Pin config is handled by the DT overlay automatically.
+# The DT overlay sets up the pins.
 
 dtparam=i2c_arm=on
 enable_uart=1
@@ -33,7 +33,10 @@ dtoverlay=i2c1,pins_44_45
 dtoverlay=i2c6,pins_22_23
 
 dtoverlay=reComputer-R100x
-dtoverlay=tpm-spi-slx9670
+
+# pstore. Kernel console and panic dumps survive a watchdog reset in /sys/fs/pstore.
+dtoverlay=ramoops-pi4,total-size=0x20000,record-size=0x4000,console-size=0x8000,pmsg-size=0x8000
+# No tpm-spi-slx9670. reComputer-R100x declares the SLB9670, on spi1.0 or with uart2 on spi0.0.
 
 
 ### reComputer R100x V1.0 ########################
@@ -53,4 +56,6 @@ dtoverlay=tpm-spi-slx9670
 # dtoverlay=i2c6,pins_22_23
 #
 # dtoverlay=reComputer-R100x,uart2
-# dtoverlay=tpm-spi-slx9670
+
+# Last line, so app.txt overrides the lines above. To replace app.txt, set CHROMASURF_CONFIG_APP.
+include app.txt
